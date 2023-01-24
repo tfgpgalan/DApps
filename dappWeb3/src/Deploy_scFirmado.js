@@ -5,8 +5,8 @@ let Web3 = require("web3");
 const solc = require('solc')
 const nodoUrl = 'HTTP://127.0.0.1:8545';
 let web3 = new Web3(nodoUrl);
-const address = '0x10000d3E30C7232dD42aA085A7fc0Ee350d28006'
-const privateKey = '2dc4d0c6dd381b6e1130888a0b1abf8269121354252c8d3d59569a7c11f68ba7'
+const address = '0x561a241bA5Cb74179E28F0A1e67Ba2B1eF08F1bd'
+const privateKey = '03ccb6779c986044899551edf47177a9eda06b3429791335d27bd4f5f753ddec'
 //Obtención de clave publica desde la privada
 const publicAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
 if (address != publicAddress) {
@@ -39,7 +39,7 @@ async function send(transaction) {
 
 async function deploy(contractName, contractArgs) {
     //Leemos el fichero con el contrato
-    const contentSc = fs.readFileSync(contractName + '.sol').toString()
+    const contentSc = fs.readFileSync('SCs/'+contractName + '.sol').toString()
     //Especifica las entradas y las salidas al compilador
     var objectSolc = {
         language: 'Solidity',
@@ -60,6 +60,7 @@ async function deploy(contractName, contractArgs) {
     const output = JSON.parse(solc.compile(JSON.stringify(objectSolc)))
     const bytecodeContract = output.contracts.coches.Coches.evm.bytecode.object
     const abi = output.contracts.coches.Coches.abi;
+
     //Creamos un objeto Contract desde el abi devuelto
     let contract = new web3.eth.Contract(abi);
     //Enviamos el contrato desplegado, y nos devuelve el recibo del envío
