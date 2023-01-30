@@ -1,0 +1,5 @@
+<button *ngIf="!addressUserView" (click)="connect()">Conectar</button>
+<h1 *ngIf="addressUserView">{{ miUser?.address }} - Saldo: {{ miUser?.balance }}{{texto}}</h1>
+{{texto}}
+<input id="hero-name" [(ngModel)]="texto" placeholder="Hero name"/>
+
