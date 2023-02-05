@@ -1,7 +1,7 @@
 const nodoUrl = 'HTTP://127.0.0.1:8545';
 const Web3 = require('web3')
 const solc = require('solc')
-//librería para leer ficheros.
+//librería para leer ficheros. 
 const fs = require('fs')
 var web3 = new Web3(nodoUrl);
 const address1 = '0x10000d3E30C7232dD42aA085A7fc0Ee350d28006'

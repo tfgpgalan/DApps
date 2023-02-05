@@ -1,16 +1,1 @@
-node_modules/.package-lock.json
-node_modules/.bin/crc32
-node_modules/.bin/crc32.cmd
-node_modules/.bin/crc32.ps1
-node_modules/.bin/miller-rabin
-node_modules/.bin/miller-rabin.cmd
-node_modules/.bin/miller-rabin.ps1
-node_modules/.bin/mime
-node_modules/.bin/mime.cmd
-node_modules/.bin/mime.ps1
-node_modules/.bin/mkdirp
-node_modules/.bin/mkdirp.cmd
-node_modules/.bin/mkdirp.ps1
-node_modules/.bin/node-gyp-build
-node_modules/.bin/node-gyp-build-optional
 node_modules/
