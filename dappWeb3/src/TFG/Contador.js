@@ -1,3 +1,5 @@
+//Este script se tiene que ejectuar en el dir padre al nodo
+const dirKeyStore1="C:/AEAT/aborrar/ethereum/RaspBerry/nodePC/keystore";
 const fs = require("fs");
 const Web3 = require('web3');
 const nodoUrl = 'HTTP://127.0.0.1:9545';
@@ -7,17 +9,17 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const address = '0x8628b9F3f125d889cA6a08C61E70Cc34B4B604a0'
 const privateKey = '8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8'
 var scProduccion;
-var intervalProduccionId=null;
+var intervalProduccionId = null;
 var conectado = false;
 
 const web3 = new Web3(nodoUrl);
+
 const checkActive = () => {
     web3.eth.net.getId()
         .then(() => {
             if (!conectado) {
                 conectado = true;
                 iniciaGrabacion();
-
             }
         })
         .catch(e => {
@@ -35,7 +37,7 @@ function iniciaGrabacion() {
     if (intervalProduccionId) clearInterval(intervalProduccionId);
     scProduccion = new web3.eth.Contract(abi, contractAddress);
     scProduccion.methods.name().call().then(console.log);
-    intervalProduccionId=setInterval(grabaProduccion, 20000);
+    intervalProduccionId = setInterval(grabaProduccion, 20000);
 }
 
 async function grabaProduccion() {
@@ -58,12 +60,14 @@ async function grabaProduccion() {
     );
 
     //Envío la transacción firmada
-    const createReceipt = await web3.eth.sendSignedTransaction(createTx.rawTransaction);
-    console.log(`Tx del método TRANSFER realizada hash: ${createReceipt.transactionHash}`);
-    //console.log(createReceipt);
-    scProduccion.methods.balanceOf(address).call().then(b => {
-        console.log('Balance de ' + address + ' despues de la transacción: ' + b);
-    })
+    web3.eth.sendSignedTransaction(createTx.rawTransaction)
+        .once('receipt', (recibo) => {
+            scProduccion.methods.balanceOf(address).call().then(b => {
+                console.log('Balance de ' + address + ' despues de la transacción: ' + b);
+            })
+        })
+        .on('error', (errx) => console.log('Error al grabar dato ' + errx))
+
 };
 
 
