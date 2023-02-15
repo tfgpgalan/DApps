@@ -1,18 +1,22 @@
 //Este script se tiene que ejectuar en el dir padre al nodo
-const dirKeyStore1="C:/AEAT/aborrar/ethereum/RaspBerry/nodePC/keystore";
+const dirNodo="C:/Users/P/Documents/PabloT/ethereum/RaspBerry/nodePC";
 const fs = require("fs");
+var address = ''; //'0x8628b9F3f125d889cA6a08C61E70Cc34B4B604a0'
+var privateKey = '';//'8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8'
+
 const Web3 = require('web3');
 const nodoUrl = 'HTTP://127.0.0.1:9545';
+const web3 = new Web3(nodoUrl);
+getPK_Firmante_Nodo();
 const abi = JSON.parse(fs.readFileSync("./Produccion.abi"));
 const contractAddress = '0x19798FAA22095716258068830d48a4E287699420';
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-const address = '0x8628b9F3f125d889cA6a08C61E70Cc34B4B604a0'
-const privateKey = '8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8'
+
 var scProduccion;
 var intervalProduccionId = null;
 var conectado = false;
 
-const web3 = new Web3(nodoUrl);
+
 
 const checkActive = () => {
     web3.eth.net.getId()
@@ -71,7 +75,15 @@ async function grabaProduccion() {
 };
 
 
-function watiosProducidos() {
+function getPK_Firmante_Nodo(){
+  let dirKeyStore=dirNodo+'/keystore';
+  let files = fs.readdirSync(dirKeyStore);
+  let file=files[0];
+  let encrypted_key=JSON.parse(fs.readFileSync(dirKeyStore+'/'+file));
+  let passw=fs.readFileSync(dirNodo+'/password.txt',{encoding:'utf8', flag:'r'});
+  let pKStore = web3.eth.accounts.decrypt(encrypted_key,passw );
+  privateKey=pKStore.privateKey;
+  address=pKStore.address;
 
 
 }
