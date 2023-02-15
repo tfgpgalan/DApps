@@ -4,7 +4,7 @@
 //las credenciales de la dir. que firma en el minado del nodo.
 //La password para obtener la pk del keystore está en el dir. donde está el script
 //y se llama password.txt
-const dirNodo = ".";//"C:/Users/P/Documents/PabloT/ethereum/RaspBerry/nodePC";
+const dirNodo = "C:/Users/P/Documents/PabloT/ethereum/RaspBerry/nodePC";
 const fs = require("fs");
 var address = '';
 var privateKey = '';
