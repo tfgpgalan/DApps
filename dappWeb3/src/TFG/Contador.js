@@ -4,7 +4,7 @@
 //las credenciales de la dir. que firma en el minado del nodo.
 //La password para obtener la pk del keystore está en el dir. donde está el script
 //y se llama password.txt
-const dirNodo = ".";//"C:/Users/P/Documents/PabloT/ethereum/RaspBerry/nodePC";
+
 const fs = require("fs");
 var address = '';
 var privateKey = '';
@@ -85,6 +85,8 @@ async function grabaProduccion() {
 
 
 function getPK_Firmante_Nodo() {
+    const dirNodo = process.argv[2];
+    if (dirNodo=='' || !fs.existsSync(dirNodo)) throw Error(`No existe el directorio ${dirNodo}`)
     let dirKeyStore = `${dirNodo}/keystore`;
     let files = fs.readdirSync(dirKeyStore);
     let file = files[0];

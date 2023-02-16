@@ -1,10 +1,20 @@
-//Script simulador grabación de contador en la bc.
-//Este script se tiene que ejectuar en el dir padre al nodo
-//Suponemos un y solo un fichero keystore en ./keystore/ donde está
-//las credenciales de la dir. que firma en el minado del nodo.
-//La password para obtener la pk del keystore está en el dir. donde está el script
-//y se llama password.txt
-const dirNodo = "C:/Users/P/Documents/PabloT/ethereum/RaspBerry/nodePC";
+
+/**
+ * TFG Pablo Galan
+ * Script simulador grabación de producción de energía en la bc.
+ * Se ejecuta con node contador.js <Directorio del nodo>
+ * Tienen que exitir los ficheros:
+ *   <Directorio del nodo>/keystore/<Unico fichero>: donde están las credenciales
+ *          de la dirección que firma las transacciones en este nodo.
+ *   <Directorio del nodo>/password.txt: password para desencriptar las credenciales
+ *   
+**/
+
+
+"use strict";
+
+process.title = "ProductorContador";
+
 const fs = require("fs");
 var address = '';
 var privateKey = '';
@@ -15,8 +25,11 @@ const web3 = new Web3(nodoUrl);
 getPK_Firmante_Nodo();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(fs.readFileSync("./Produccion.abi"));
+//Dir. del sc que hemos deployado con Remix
 const contractAddress = '0x19798FAA22095716258068830d48a4E287699420';
 const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
+//Cada cuantos segundos se hace una grabación de la lectura del contador
+const SEG_GRABACION=20;
 
 var scProduccion;
 var intervalProduccionId = null;
@@ -33,7 +46,7 @@ function isConectedDaemon() {
                 }
             })
             .catch(e => {
-                console.log('Wow. Something went wrong: ' + e);
+                console.log('Algo va mal: ' + e);
                 conectado = false;
                 if (intervalProduccionId) clearInterval(intervalProduccionId);
                 web3.setProvider(nodoUrl);
@@ -48,9 +61,12 @@ function isConectedDaemon() {
 function iniciaGrabacion() {
     console.log('Inicia grabación');
     if (intervalProduccionId) clearInterval(intervalProduccionId);
+    //Identificamos el contrato con el abi y su dir en la bc.
     scProduccion = new web3.eth.Contract(abi, contractAddress);
+    //Llamamos al metodo name del sc ERC20, que al deployarlo le dimos la unidad de medida 
     scProduccion.methods.name().call().then(nombreTk => console.log(`Unidad de medida: ${nombreTk}`));
-    intervalProduccionId = setInterval(grabaProduccion, 20000);
+    //Cada SEG_GRABACION segundos crea una grabación
+    intervalProduccionId = setInterval(grabaProduccion, SEG_GRABACION*1000);
 }
 
 async function grabaProduccion() {
@@ -58,9 +74,9 @@ async function grabaProduccion() {
     scProduccion.methods.balanceOf(address).call().then(b => {
         console.log(`Balance de ${address} antes de transacción: ${b}`);
     });
-    //Referencia al metodo llamado
+    //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación
     let grabaProduccionTx = scProduccion.methods.transfer(ZERO_ADDRESS, 10);
-    //Creo objeto transaccion firmada
+    //Creo objeto transacción firmada
     const createTx = await web3.eth.accounts.signTransaction(
         {   //Dir del sc
             to: scProduccion.options.address,
@@ -85,6 +101,8 @@ async function grabaProduccion() {
 
 
 function getPK_Firmante_Nodo() {
+    const dirNodo = process.argv[2];
+    if (dirNodo=='' || !fs.existsSync(dirNodo)) throw Error(`No existe el directorio ${dirNodo}`)
     let dirKeyStore = `${dirNodo}/keystore`;
     let files = fs.readdirSync(dirKeyStore);
     let file = files[0];
@@ -93,6 +111,4 @@ function getPK_Firmante_Nodo() {
     let pKStore = web3.eth.accounts.decrypt(encrypted_key, passw);
     privateKey = pKStore.privateKey;
     address = pKStore.address;
-
-
 }
