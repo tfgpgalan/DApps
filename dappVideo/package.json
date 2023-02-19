@@ -1,0 +1,22 @@
+{
+  "name": "dappvideo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "node ./contracts/js/compile.js",
+    "deploy": "node ./contracts/js/deploy.js",
+    "dev": "lite-server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^2.1.7",
+    "solc": "^0.8.18",
+    "web3": "^1.8.2"
+  },
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}

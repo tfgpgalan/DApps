@@ -26,7 +26,7 @@ getPK_Firmante_Nodo();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(fs.readFileSync("./Produccion.abi"));
 //Dir. del sc que hemos deployado con Remix
-const contractAddress = '0x19798FAA22095716258068830d48a4E287699420';
+const contractAddress = '0x539E1276851C584300B34a27f8FFEE71B1a9a757';
 const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
 //Cada cuantos segundos se hace una grabación de la lectura del contador
 const SEG_GRABACION=20;
@@ -111,4 +111,8 @@ function getPK_Firmante_Nodo() {
     let pKStore = web3.eth.accounts.decrypt(encrypted_key, passw);
     privateKey = pKStore.privateKey;
     address = pKStore.address;
+    privateKey = '8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8';
+    address = '0x8628b9F3f125d889cA6a08C61E70Cc34B4B604a0';
+
+
 }
