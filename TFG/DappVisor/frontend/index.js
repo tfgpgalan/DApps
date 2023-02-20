@@ -10,7 +10,13 @@ let scProduccion;
 let lProductores;
 let decimales;
 
-
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'bottom-up',
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: false
+});
 
  function conctract() {
   web3 = new Web3(nodoUrl);
@@ -42,12 +48,6 @@ const listaProductores = () => {
   
 window.onload = conctract();
 
-const Toast = Swal.mixin({
-  toast: true,
-  position: 'bottom-up',
-  showConfirmButton: false,
-  timer: 2000,
-  timerProgressBar: false
-});
+
 
 
