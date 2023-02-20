@@ -2,7 +2,7 @@
 /**
  * TFG Pablo Galan
  * Script simulador grabación de producción de energía en la bc.
- * Se ejecuta con node contador.js <Directorio del nodo>
+ * Se ejecuta con npm start <Directorio del nodo>
  * Tienen que exitir los ficheros:
  *   <Directorio del nodo>/keystore/<Unico fichero>: donde están las credenciales
  *          de la dirección que firma las transacciones en este nodo.
@@ -11,7 +11,6 @@
 **/
 
 
-"use strict";
 
 process.title = "ProductorContador";
 
@@ -81,7 +80,7 @@ async function grabaProduccion() {
     });
     
     const energiaGenerada=Math.floor(Math.random() * MAX_POWER_PERIODO+1);
-    //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación
+    //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación de energía
     let grabaProduccionTx = scProduccion.methods.transfer(ZERO_ADDRESS, energiaGenerada);
     //Creo objeto transacción firmada
     const createTx = await web3.eth.accounts.signTransaction(
@@ -99,7 +98,7 @@ async function grabaProduccion() {
     web3.eth.sendSignedTransaction(createTx.rawTransaction)
         .once('receipt', (recibo) => {
             scProduccion.methods.balanceOf(address).call().then(b => {
-                console.log(`Balance de ${address}  despues de la transacción: ${b} (Blq. ${recibo.blockNumber})`);
+                console.log(`Balance de ${address}  después de la transacción: ${b} (Blq. ${recibo.blockNumber})`);
             })
         })
         .on('error', (errx) => console.log(`Error al grabar dato ${errx}`))
