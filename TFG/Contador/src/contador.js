@@ -24,12 +24,17 @@ const nodoUrl = 'HTTP://127.0.0.1:9545';
 const web3 = new Web3(nodoUrl);
 getPK_Firmante_Nodo();
 //Leemos el descriptor del sc Produccion
-const abi = JSON.parse(fs.readFileSync("./Produccion.abi"));
+const abi = JSON.parse(fs.readFileSync("./src/Produccion.abi"));
 //Dir. del sc que hemos deployado con Remix
-const contractAddress = '0x539E1276851C584300B34a27f8FFEE71B1a9a757';
+const contractAddress = '0xf128EBE06396A5636230d3425873106C73491470';
 const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
 //Cada cuantos segundos se hace una grabación de la lectura del contador
 const SEG_GRABACION=20;
+//Potencia máxima de la instalación en W
+const MAX_POWER=400*5;  //5 paneles de 400W 
+//En una hora al máx de generación esta instalación produciría 2000Wh o 2kWh
+//Potencia máxima generada en SEG_GRABACION segundos
+const MAX_POWER_PERIODO=(MAX_POWER*SEG_GRABACION)/(60*60);
 
 var scProduccion;
 var intervalProduccionId = null;
@@ -74,8 +79,10 @@ async function grabaProduccion() {
     scProduccion.methods.balanceOf(address).call().then(b => {
         console.log(`Balance de ${address} antes de transacción: ${b}`);
     });
+    
+    const energiaGenerada=Math.floor(Math.random() * MAX_POWER_PERIODO+1);
     //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación
-    let grabaProduccionTx = scProduccion.methods.transfer(ZERO_ADDRESS, 10);
+    let grabaProduccionTx = scProduccion.methods.transfer(ZERO_ADDRESS, energiaGenerada);
     //Creo objeto transacción firmada
     const createTx = await web3.eth.accounts.signTransaction(
         {   //Dir del sc
@@ -111,8 +118,8 @@ function getPK_Firmante_Nodo() {
     let pKStore = web3.eth.accounts.decrypt(encrypted_key, passw);
     privateKey = pKStore.privateKey;
     address = pKStore.address;
-    privateKey = '8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8';
-    address = '0x8628b9F3f125d889cA6a08C61E70Cc34B4B604a0';
+   // privateKey = '8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8';
+  //  address = '0x8628b9F3f125d889cA6a08C61E70Cc34B4B604a0';
 
 
 }
