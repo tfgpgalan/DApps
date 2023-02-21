@@ -78,13 +78,13 @@ async function grabaProduccion() {
     const privateKey=privateKeys[ialeatorio];
     const address=addresses[ialeatorio];
     //Comprobamos balance de la cuenta antes de transferir
-    scProduccion.methods.balanceOf(address).call().then(b => {
-        console.log(`Balance de ${address} antes de transacción: ${b}`);
-    });
+    const b=await scProduccion.methods.balanceOf(address).call();
+    console.log(`Balance de ${address} ANTES de transacción: ${b}`);
     
     const energiaGenerada=Math.floor(Math.random() * MAX_POWER_PERIODO+1);
     //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación de energía
     let grabaProduccionTx = scProduccion.methods.transfer(ZERO_ADDRESS, energiaGenerada);
+  
     //Creo objeto transacción firmada
     const createTx = await web3.eth.accounts.signTransaction(
         {   //Dir del sc
@@ -97,14 +97,14 @@ async function grabaProduccion() {
         privateKey
     );
 
-    //Envío la transacción firmada
+
+     //Envío la transacción firmada
     web3.eth.sendSignedTransaction(createTx.rawTransaction)
-        .once('receipt', (recibo) => {
-            scProduccion.methods.balanceOf(address).call().then(b => {
-                console.log(`Balance de ${address}  después de la transacción: ${b} (Blq. ${recibo.blockNumber})`);
-            })
+        .once('receipt', async (recibo) => {
+            const b=await scProduccion.methods.balanceOf(address).call();
+            console.log(`Balance de ${address} DESPUÉS de transacción: ${b} (Blq. ${recibo.blockNumber}`);
         })
-        .on('error', (errx) => console.log(`Error al grabar dato ${errx}`))
+        .on('error', (errx) => console.log(`Error al grabar dato ${errx}`)) 
 
 };
 
