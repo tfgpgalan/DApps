@@ -4,7 +4,7 @@
   "description": "Grabación en blockchain de lecturas simuladas de un contador eléctrico",
   "main": "src/contador.js",
   "scripts": {
-    "start": "node .",
+    "contador": "node .",
     "multiple": "node src/contadorMultiple.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

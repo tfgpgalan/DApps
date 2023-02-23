@@ -7,7 +7,8 @@
  *   <Directorio del nodo>/keystore/<Unico fichero>: donde están las credenciales
  *          de la dirección que firma las transacciones en este nodo.
  *   <Directorio del nodo>/password.txt: password para desencriptar las credenciales
- *   
+ * 
+ * Este script se pondría en cada nodo de la red para simular contador de producción de electricidad.
 **/
 
 
@@ -36,6 +37,7 @@ const MAX_POWER=400*5;  //5 paneles de 400W
 const MAX_POWER_PERIODO=(MAX_POWER*SEG_GRABACION)/(60*60);
 
 var scProduccion;
+var nombreTk;
 var intervalProduccionId = null;
 var conectado = false;
 isConectedDaemon();
@@ -68,16 +70,17 @@ function iniciaGrabacion() {
     //Identificamos el contrato con el abi y su dir en la bc.
     scProduccion = new web3.eth.Contract(abi, contractAddress);
     //Llamamos al metodo name del sc ERC20, que al deployarlo le dimos la unidad de medida 
-    scProduccion.methods.name().call().then(nombreTk => console.log(`Unidad de medida: ${nombreTk}`));
+    scProduccion.methods.name().call().then(nombretk => {nombreTk=nombretk;console.log(`Unidad de medida: ${nombreTk}`)});
     //Cada SEG_GRABACION segundos crea una grabación
     intervalProduccionId = setInterval(grabaProduccion, SEG_GRABACION*1000);
 }
 
 async function grabaProduccion() {
+    const straddress=''.concat(address.slice(0,5),'...',address.slice(-3));
     //Comprobamos balance de la cuenta antes de transferir
-    scProduccion.methods.balanceOf(address).call().then(b => {
-        console.log(`Balance de ${address} antes de transacción: ${b}`);
-    });
+    const b=await scProduccion.methods.balanceOf(address).call();
+
+    console.log(`Producción acumulada de ${straddress} ANTES de transacción: ${b}${nombreTk}.`);
     
     const energiaGenerada=Math.floor(Math.random() * MAX_POWER_PERIODO+1);
     //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación de energía
@@ -96,10 +99,9 @@ async function grabaProduccion() {
 
     //Envío la transacción firmada
     web3.eth.sendSignedTransaction(createTx.rawTransaction)
-        .once('receipt', (recibo) => {
-            scProduccion.methods.balanceOf(address).call().then(b => {
-                console.log(`Balance de ${address}  después de la transacción: ${b} (Blq. ${recibo.blockNumber})`);
-            })
+        .once('receipt', async (recibo) => {
+            const b=await scProduccion.methods.balanceOf(address).call();
+            console.log(`Producción acumulada de ${straddress} DESPUÉS de transacción: ${b}${nombreTk} (Blq. ${recibo.blockNumber}).`);
         })
         .on('error', (errx) => console.log(`Error al grabar dato ${errx}`))
 
@@ -117,8 +119,4 @@ function getPK_Firmante_Nodo() {
     let pKStore = web3.eth.accounts.decrypt(encrypted_key, passw);
     privateKey = pKStore.privateKey;
     address = pKStore.address;
-   // privateKey = '8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8';
-  //  address = '0x8628b9F3f125d889cA6a08C61E70Cc34B4B604a0';
-
-
 }

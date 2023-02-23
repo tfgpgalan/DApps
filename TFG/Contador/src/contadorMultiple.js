@@ -2,9 +2,10 @@
 /**
  * TFG Pablo Galan
  * Script simulador grabación de producción de energía en la bc.
- * Se ejecuta con npm start <Directorio del nodo>
+ * Se ejecuta con npm run multiple.
  * Vamos a tomar varias pks de varias cuentas para simular generación
  * en varios contadores.
+ * 
  * 
 **/
 
@@ -36,6 +37,7 @@ const MAX_POWER=400*5;  //5 paneles de 400W
 const MAX_POWER_PERIODO=(MAX_POWER*SEG_GRABACION)/(60*60);
 
 var scProduccion;
+var nombreTk;
 var intervalProduccionId = null;
 var conectado = false;
 isConectedDaemon();
@@ -68,7 +70,7 @@ function iniciaGrabacion() {
     //Identificamos el contrato con el abi y su dir en la bc.
     scProduccion = new web3.eth.Contract(abi, contractAddress);
     //Llamamos al metodo name del sc ERC20, que al deployarlo le dimos la unidad de medida 
-    scProduccion.methods.name().call().then(nombreTk => console.log(`Unidad de medida: ${nombreTk}`));
+    scProduccion.methods.name().call().then(nombretk => {nombreTk=nombretk;console.log(`Unidad de medida: ${nombreTk}`)});
     //Cada SEG_GRABACION segundos crea una grabación
     intervalProduccionId = setInterval(grabaProduccion, SEG_GRABACION*1000);
 }
@@ -77,9 +79,13 @@ async function grabaProduccion() {
     const ialeatorio=Math.floor(Math.random() * privateKeys.length);
     const privateKey=privateKeys[ialeatorio];
     const address=addresses[ialeatorio];
+    const straddress=''.concat(address.slice(0,5),'...',address.slice(-3));
     //Comprobamos balance de la cuenta antes de transferir
     const b=await scProduccion.methods.balanceOf(address).call();
-    console.log(`Balance de ${address} ANTES de transacción: ${b}`);
+
+    console.log(`Producción acumulada de ${straddress} ANTES de transacción: ${b}${nombreTk}.`);
+    //console.log(`Balance: ${await web3.eth.getBalance(address)}`);
+    
     
     const energiaGenerada=Math.floor(Math.random() * MAX_POWER_PERIODO+1);
     //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación de energía
@@ -102,7 +108,8 @@ async function grabaProduccion() {
     web3.eth.sendSignedTransaction(createTx.rawTransaction)
         .once('receipt', async (recibo) => {
             const b=await scProduccion.methods.balanceOf(address).call();
-            console.log(`Balance de ${address} DESPUÉS de transacción: ${b} (Blq. ${recibo.blockNumber}`);
+            console.log(`Producción acumulada de ${straddress} DESPUÉS de transacción: ${b}${nombreTk} (Blq. ${recibo.blockNumber}).`);
+            //console.log(`Balance: ${await web3.eth.getBalance(address)}`);
         })
         .on('error', (errx) => console.log(`Error al grabar dato ${errx}`)) 
 
