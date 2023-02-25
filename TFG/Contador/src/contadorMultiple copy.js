@@ -2,13 +2,11 @@
 /**
  * TFG Pablo Galan
  * Script simulador grabación de producción de energía en la bc.
- * Se ejecuta con npm start <Directorio del nodo>
- * Tienen que exitir los ficheros:
- *   <Directorio del nodo>/keystore/<Unico fichero>: donde están las credenciales
- *          de la dirección que firma las transacciones en este nodo.
- *   <Directorio del nodo>/password.txt: password para desencriptar las credenciales
+ * Se ejecuta con npm run multiple.
+ * Vamos a tomar varias pks de varias cuentas para simular generación
+ * en varios contadores.
  * 
- * Este script se pondría en cada nodo de la red para simular contador de producción de electricidad.
+ * 
 **/
 
 
@@ -16,21 +14,23 @@
 process.title = "ProductorContador";
 
 const fs = require("fs");
-var address = '';
-var privateKey = '';
+
+const privateKeys=[];
+const addresses=[];
+
 
 const Web3 = require('web3');
 const nodoUrl = 'HTTP://127.0.0.1:9545';
 const web3 = new Web3(nodoUrl);
-getPK_Firmante_Nodo();
+getPKs_Firmantes();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(fs.readFileSync("./src/Produccion.abi"));
 //Dir. del sc que hemos deployado con Remix
-const contractAddress ='0x2A94dE578d3461E8941459F7204DA4be1A106eFC';
-// '0xf128EBE06396A5636230d3425873106C73491470';
+const contractAddress = '0x2A94dE578d3461E8941459F7204DA4be1A106eFC';
+//'0xf128EBE06396A5636230d3425873106C73491470';
 const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
 //Cada cuantos segundos se hace una grabación de la lectura del contador
-const SEG_GRABACION=20;
+const SEG_GRABACION=10;
 //Potencia máxima de la instalación en W
 const MAX_POWER=400*5;  //5 paneles de 400W 
 //En una hora al máx de generación esta instalación produciría 2000Wh o 2kWh
@@ -77,15 +77,21 @@ function iniciaGrabacion() {
 }
 
 async function grabaProduccion() {
+    const ialeatorio=Math.floor(Math.random() * privateKeys.length);
+    const privateKey=privateKeys[ialeatorio];
+    const address=addresses[ialeatorio];
     const straddress=''.concat(address.slice(0,5),'...',address.slice(-3));
     //Comprobamos balance de la cuenta antes de transferir
     const b=await scProduccion.methods.balanceOf(address).call();
 
     console.log(`Producción acumulada de ${straddress} ANTES de transacción: ${b}${nombreTk}.`);
+    //console.log(`Balance: ${await web3.eth.getBalance(address)}`);
+    
     
     const energiaGenerada=Math.floor(Math.random() * MAX_POWER_PERIODO+1);
     //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación de energía
     let grabaProduccionTx = scProduccion.methods.transfer(ZERO_ADDRESS, energiaGenerada);
+  
     //Creo objeto transacción firmada
     const createTx = await web3.eth.accounts.signTransaction(
         {   //Dir del sc
@@ -98,26 +104,23 @@ async function grabaProduccion() {
         privateKey
     );
 
-    //Envío la transacción firmada
+
+     //Envío la transacción firmada
     web3.eth.sendSignedTransaction(createTx.rawTransaction)
         .once('receipt', async (recibo) => {
             const b=await scProduccion.methods.balanceOf(address).call();
             console.log(`Producción acumulada de ${straddress} DESPUÉS de transacción: ${b}${nombreTk} (Blq. ${recibo.blockNumber}).`);
+            //console.log(`Balance: ${await web3.eth.getBalance(address)}`);
         })
-        .on('error', (errx) => console.log(`Error al grabar dato ${errx}`))
+        .on('error', (errx) => console.log(`Error al grabar dato ${errx}`)) 
 
 };
 
 
-function getPK_Firmante_Nodo() {
-    const dirNodo = process.argv[2];
-    if (dirNodo=='' || !fs.existsSync(dirNodo)) throw Error(`No existe el directorio ${dirNodo}`)
-    let dirKeyStore = `${dirNodo}/keystore`;
-    let files = fs.readdirSync(dirKeyStore);
-    let file = files[0];
-    let encrypted_key = JSON.parse(fs.readFileSync(dirKeyStore + '/' + file));
-    let passw = fs.readFileSync(`${dirNodo}/password.txt`, { encoding: 'utf8', flag: 'r' });
-    let pKStore = web3.eth.accounts.decrypt(encrypted_key, passw);
-    privateKey = pKStore.privateKey;
-    address = pKStore.address;
+function getPKs_Firmantes() {
+    privateKeys.push('8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8',
+    '230bcd8db487f554310d367d9d0f1ca7b1c420feb48fe0baaf34b11c212f523b',
+    'b352eb0fdcae639ecad63c28dda9e1c1b16617de719455abfa4dd6f5ca7a1b7f'
+    )
+    privateKeys.forEach(pk=>addresses.push(web3.eth.accounts.privateKeyToAccount(pk).address));
 }
