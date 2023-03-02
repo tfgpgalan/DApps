@@ -26,7 +26,8 @@ getPKs_Firmantes();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(fs.readFileSync("./ProduccionSemanal.abi"));
 //Dir. del sc que hemos deployado con Remix
-const contractAddress = '0xE694db2e2c827A8DB5D251c1ca4C2532Ace6E5EF';
+const contractAddress = '0x6A676121D0F40cDf42F49aaE47882dA509a81dD1';
+//'0xE694db2e2c827A8DB5D251c1ca4C2532Ace6E5EF';
 //'0xf128EBE06396A5636230d3425873106C73491470';
 const MAX_POWER = 400 * 5;  //5 paneles de 400W 
 const DIAS_SOL_SEVILLA = 300;
@@ -47,9 +48,10 @@ async function grabaProduccionSemanal() {
     //Llamamos al metodo name del sc ERC20, que al deployarlo le dimos la unidad de medida 
     nombreTk=await scProduccion.methods.name().call();
     console.log(`Unidad de medida: ${nombreTk}`);
- 
+    //La primera cuenta se utilizará para firmar todas las transacciones, TIENE QUE TENER FONDOS
+    const privateKeyFirmante = privateKeys[0];
     for (ipk = 0; ipk < privateKeys.length; ipk++) {
-        const privateKey = privateKeys[ipk];
+        
         const address = addresses[ipk];
         const straddress = ''.concat(address.slice(0, 5), '...', address.slice(-3));
         for (dow = 1; dow <= 7; dow++) {
@@ -67,7 +69,7 @@ async function grabaProduccionSemanal() {
                     gas: await grabaProduccionTx.estimateGas({ value: '0' }),
                     value: '0'
                 },
-                privateKey
+                privateKeyFirmante
             );
 
             const recibo=await web3.eth.sendSignedTransaction(createTx.rawTransaction);
@@ -102,15 +104,13 @@ function generaProduccionDiaria() {
 
 
 function getPKs_Firmantes() {
-    privateKeys.push('8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8',
-        '230bcd8db487f554310d367d9d0f1ca7b1c420feb48fe0baaf34b11c212f523b',
-        'b352eb0fdcae639ecad63c28dda9e1c1b16617de719455abfa4dd6f5ca7a1b7f'
+    //La primera cuenta es la que se va a utilizar para firmar las transacciones
+    //TIENE QUE TERNER FONDOS.
+    privateKeys.push( '230bcd8db487f554310d367d9d0f1ca7b1c420feb48fe0baaf34b11c212f523b',
+    '8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8',
+    'b352eb0fdcae639ecad63c28dda9e1c1b16617de719455abfa4dd6f5ca7a1b7f'
+    
     )
     privateKeys.forEach(pk => addresses.push(web3.eth.accounts.privateKeyToAccount(pk).address));
 }
 
-function fact(n) {
-    f = 1;
-    for (i = 1; i < n + 1; i++) { f = f * i };
-    return f
-}

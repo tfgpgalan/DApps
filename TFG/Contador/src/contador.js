@@ -26,7 +26,7 @@ getPK_Firmante_Nodo();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(fs.readFileSync("./src/Produccion.abi"));
 //Dir. del sc que hemos deployado con Remix
-const contractAddress ='0x2A94dE578d3461E8941459F7204DA4be1A106eFC';
+const contractAddress ='0xf128EBE06396A5636230d3425873106C73491470';
 // '0xf128EBE06396A5636230d3425873106C73491470';
 const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
 //Cada cuantos segundos se hace una grabación de la lectura del contador
