@@ -56,29 +56,29 @@ const listaProductores = () => {
     lProductores.forEach(async function (productor) {
       const balance= await scProduccion.methods.balanceOf(productor).call();
       const balancecondecimales=(balance/10**decimales).toLocaleString(undefined, { minimumFractionDigits: decimales });
-      tablaProductores += `<tr><th scope="row">${++i}</th><td>${productor}</td><td class="text-right">${balancecondecimales}</td></tr>`;
+      tablaProductores += `<tr><th scope="row">${++i}</th><td>${productor}</td>`;
+      tablaProductores += `<td class="text-right">${balancecondecimales}</td></tr>`;
+      tablaProductores += `<td class="text-right">${balancecondecimales}</td></tr>`;
       document.getElementById('lProductores').innerHTML = tablaProductores;
     });
-    getProduccionSemanal (lProductores);
+    getProduccionSemanal (lProductores[0]).then(x=>console.log(x));
   });
 }
 
-function getProduccionSemanal (lProductores) {
-  lProductores.forEach(productor =>{
-  scProduccion.methods.getBalanceOfDaysOfWeek(productor).call().then(respuesta=>{
+function getProduccionSemanal (unProductor) {
+ return scProduccion.methods.getBalanceOfDaysOfWeek(unProductor).call().then(respuesta=>{
     produccionSemanal=respuesta.produccion;
     for (i=0;i<respuesta.dias.length;i++){
       const diax=respuesta.dias[i];
       let sumProdDia=0;
       produccionSemanal[i].forEach(valor=>sumProdDia+=parseInt(valor));
-      diasSemana.push({fecha:new Date(diax*1000),produccion:sumProdDia});
+      diasSemana.push({fecha:new Date(diax*1000),produccionDia:sumProdDia,detalleDiario:produccionSemanal[i]});
     }
-   // respuesta.dias.forEach(diax=>diasSemana.push({fecha:new Date(diax*1000),produccion:88}));
-    console.log(diasSemana[4]);
-    
-    
+   
+    let salida={productor:unProductor,produccionSemanal:diasSemana};
+    return salida;
   }
-  )});
+  );
 }
 
 
