@@ -4,12 +4,9 @@
  * Script simulador grabación de producción de energía en la bc.
  * Se ejecuta con npm run multiple.
  * Vamos a tomar varias pks de varias cuentas para simular generación
- * en varios contadores.
- * 
+ * en varios contadores. 
  * 
 **/
-
-
 
 process.title = "ProductorContador";
 
@@ -18,7 +15,6 @@ const fs = require("fs");
 const privateKeys = [];
 const addresses = [];
 
-
 const Web3 = require('web3');
 const nodoUrl = 'HTTP://127.0.0.1:9545';
 const web3 = new Web3(nodoUrl);
@@ -26,22 +22,16 @@ getPKs_Firmantes();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(fs.readFileSync("./ProduccionSemanal.abi"));
 //Dir. del sc que hemos deployado con Remix
-const contractAddress = '0x6A676121D0F40cDf42F49aaE47882dA509a81dD1';
-//'0xE694db2e2c827A8DB5D251c1ca4C2532Ace6E5EF';
-//'0xf128EBE06396A5636230d3425873106C73491470';
+const contractAddress = '0x3080aD2aB0E0aaCa36B4e03F5B6c76B414c296fC';
+
 const MAX_POWER = 400 * 5;  //5 paneles de 400W 
-const DIAS_SOL_SEVILLA = 300;
-const DiasNublados365 = 365- DIAS_SOL_SEVILLA;
+const DIAS_SOL = 300;
+const DiasNublados365 = 365- DIAS_SOL;
 const DiasNublados100=(DiasNublados365*100)/365;
-
-
 
 var scProduccion;
 var nombreTk;
 grabaProduccionSemanal();
-
-
-
 
 async function grabaProduccionSemanal() {
     scProduccion = new web3.eth.Contract(abi, contractAddress);
@@ -89,16 +79,23 @@ async function grabaProduccionSemanal() {
 
 function generaProduccionDiaria() {
     const DiaNublado=Math.floor(Math.random()*100)<DiasNublados100;
+    //console.log(DiaNublado)
     pDiaria = [];
     for (hora = 0; hora < 24; hora++) {
         let energiaHora = 0;
-        if (hora >= 9 && hora <= 14) energiaHora = (hora - 9) * (MAX_POWER / (14 - 9));
+        const HORAMAXSOL=13;
+        //if (hora >= 9 && hora <= 21) energiaHora =(1/(1+(16-hora)**4))*MAX_POWER;
+        energiaHora=Math.E**(-0.1*(hora-HORAMAXSOL)**2)*MAX_POWER;
+/*         if (hora >= 9 && hora <= 14) energiaHora = (hora - 9) * (MAX_POWER / (14 - 9));
         if (hora > 14 && hora <= 18) energiaHora = MAX_POWER;
-        if (hora > 18 && hora <= 21) energiaHora = (-(hora - 21) * (MAX_POWER / (21 - 18)));
-        energiaHora=Math.floor(DiaNublado?energiaHora*0.5:energiaHora);
+        if (hora > 18 && hora <= 21) energiaHora = (-(hora - 21) * (MAX_POWER / (21 - 18))); */
+        const NUBE=DiaNublado?(Math.random()<0.8):(Math.random()<0.2)
+        //console.log(NUBE)
+        energiaHora=Math.floor(NUBE?energiaHora*0.8:energiaHora);
         pDiaria.push(energiaHora);
         
     } 
+    console.log(pDiaria);
     return pDiaria;
 }
 
