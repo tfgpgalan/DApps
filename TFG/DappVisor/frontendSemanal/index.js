@@ -1,4 +1,4 @@
-const addressContract = "0x3080aD2aB0E0aaCa36B4e03F5B6c76B414c296fC";
+const addressContract = "0x9aC37CE0f34b83010dC0C2dC5Ee70fDE60b1ecad";
 const nodoUrl = 'HTTP://127.0.0.1:9545';
 
 let web3;
@@ -8,7 +8,7 @@ let semanaUnProductor;
 let abi = '';
 
 async function empieza() {
-  await fetch('./ProduccionSemanal.abi').then(async (response) => {
+  await fetch('/ProduccionSemanal.abi').then(async (response) => {
     abi = await response.json();
     conctract();
   });
@@ -108,6 +108,7 @@ function muestraGraficaSemanal(ctx) {
   chart.title("<span style='font-style:italic'>Producción diaria última semana</span>");
   chart.xAxis().title('Día');
   chart.yAxis().title('kWh');
+  chart.yGrid().enabled(true);
   // configure tooltips
   let tooltip = chart.tooltip();
   tooltip.useHtml(true);
@@ -131,6 +132,7 @@ function muestraGraficaSemanal(ctx) {
     tooltipChart.title(`Producción día: ${getFormattedDate(prodDia.fecha)} - ${totalDia} kWh, distribución por horas<br>`);
     tooltipChart.xAxis().title('Hora del día');
     tooltipChart.yAxis().title('Wh');
+    tooltipChart.yGrid().enabled(true);
   });
 
   chart.tooltip().onDomReady(function () {

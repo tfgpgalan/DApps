@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "compile": "node ./contracts/js/compile.js",
-    "deploy": "node ./contracts/js/deploy.js",
+    "compile": "node ./contracts/js/compile.js ProduccionSemanalHora",
+    "deploy": "node ./contracts/js/deploy.js ProduccionSemanalHora \"[0, \"\"kWh\"\", 3]\"",
     "dev": "lite-server"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "solc": "^0.8.19",
     "web3": "^1.8.2"
   },
   "devDependencies": {

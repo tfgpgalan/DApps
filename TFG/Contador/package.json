@@ -6,6 +6,7 @@
   "scripts": {
     "contador": "node .",
     "multiple": "node src/contadorMultiple.js",
+    "multiplesemanal": "node src/produccionsemanal/contadorMultipleSemanal.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "PabloG",

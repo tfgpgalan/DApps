@@ -20,9 +20,9 @@ const nodoUrl = 'HTTP://127.0.0.1:9545';
 const web3 = new Web3(nodoUrl);
 getPKs_Firmantes();
 //Leemos el descriptor del sc Produccion
-const abi = JSON.parse(fs.readFileSync("./ProduccionSemanal.abi"));
+const abi = JSON.parse(fs.readFileSync(__dirname +"/ProduccionSemanal.abi"));
 //Dir. del sc que hemos deployado con Remix
-const contractAddress = '0x3080aD2aB0E0aaCa36B4e03F5B6c76B414c296fC';
+const contractAddress = '0x9aC37CE0f34b83010dC0C2dC5Ee70fDE60b1ecad';
 
 const MAX_POWER = 400 * 5;  //5 paneles de 400W 
 const DIAS_SOL = 300;
