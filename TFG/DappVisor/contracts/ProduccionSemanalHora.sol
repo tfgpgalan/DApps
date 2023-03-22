@@ -16,22 +16,28 @@ contract ProduccionSemanalHora is IERC20 {
        uint timestamp;
        mapping (uint => uint256) produccionXhora;
     }
+    //Cada address tendrá un mapping de 7 dias y cada uno de 24 horas 
+    //y cada hora acumulará la producción que mande el contador en esa hora.
     mapping(address => mapping(uint => ProducccionDia )) private _balanceHoraDayofWeek;
     uint8 public decimals;
     string public name;
     uint256 private constant MAX_UINT256 = 2**256 - 1;
-    address owner;
+    //Propietario del contrato
+    address public owner;
     uint fechaInicio;
     //Utiles para mantener la lista de productores iterable,
-    //Todo productor que alguna vez haya producido o recibido se registrará
+    //Productor que alguna vez haya producido o recibido se registrará
     //en _productores.
     using MapIterableLib for MapIterableLib.MapIterable;
     MapIterableLib.MapIterable private _productores;
+    //Libreria utilitaria para tratar fechas
     using BokkyPooBahsDateTimeLibrary for uint;
 
-
+    //Evento que se emitirá cada vez que se grabe producción
     event GrabaHora(address indexed from, uint dia, uint hora, uint produccion);
 
+    //En principio se llamará con los valores 0,'kWh', 3
+    //No se han establecido por mantener IERC20
     constructor(uint256 _initialAmount, string memory _tokenName, uint8 _decimalUnits) {
         _balance[msg.sender] = _initialAmount;
         totalSupply = _initialAmount;
@@ -43,9 +49,6 @@ contract ProduccionSemanalHora is IERC20 {
         
     }
 
-
-
-//0x0000000000000000000000000000000000000000
     //Si _to es 0x0 se supone que es producción de watios
     function transfer(address _to, uint256 _value) public override returns (bool success)
     {
@@ -54,12 +57,15 @@ contract ProduccionSemanalHora is IERC20 {
                 _productores.addElemento(msg.sender);
                 inicia_balance_productor_nuevo(msg.sender);
             }
+            //Producción acumulada desde el inicio del contrato
             _balance[msg.sender] += _value;
             uint dayofWeek=block.timestamp.getDayOfWeek();
             uint horadeldia=block.timestamp.getHour();
-            if (horadeldia==0) iniciaDia(dayofWeek,msg.sender,block.timestamp);
-            emit GrabaHora(msg.sender, dayofWeek-1, horadeldia,_value);
             ProducccionDia storage prodDia=_balanceHoraDayofWeek[msg.sender][dayofWeek-1];
+            //Inicio de día con posibilidad de corte de lecturas
+            if (horadeldia<=22 && prodDia.produccionXhora[horadeldia+1]!=0) iniciaDia(dayofWeek,msg.sender,block.timestamp);
+            emit GrabaHora(msg.sender, dayofWeek-1, horadeldia,_value);
+            //Acumula las lecturas que mande el contador en la hora en curso 
             prodDia.produccionXhora[horadeldia]+=_value;
             totalSupply+=_value;
 
@@ -80,6 +86,7 @@ contract ProduccionSemanalHora is IERC20 {
     }
 //Función para generar valores demo, quitar en producción
     function acumula_dia(address _address,uint _dayOfWeek,uint[] memory _produccion_hora) public {
+        require(owner == msg.sender,unicode"Solo puede utilizar función demo el owner del contrato.");
         require(_dayOfWeek>=1 && _dayOfWeek<=7 && _produccion_hora.length==24,unicode"Día o matriz de horas(24) error");
         if (!_productores.isInList(_address)){
             _productores.addElemento(_address);
@@ -104,7 +111,8 @@ contract ProduccionSemanalHora is IERC20 {
         }
     }
 
-    
+    //Devuelve la matriz de producción semanal de un productor y
+    //los días a que corresponde 
     function getBalanceOfDaysOfWeek(address _productor) public view returns(uint256[24][7] memory produccion, uint[7] memory dias) {
         
         for (uint dia=0; dia<=6;dia++){

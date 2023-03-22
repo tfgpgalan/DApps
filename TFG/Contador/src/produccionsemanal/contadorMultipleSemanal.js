@@ -20,9 +20,9 @@ const nodoUrl = 'HTTP://127.0.0.1:9545';
 const web3 = new Web3(nodoUrl);
 getPKs_Firmantes();
 //Leemos el descriptor del sc Produccion
-const abi = JSON.parse(fs.readFileSync(__dirname +"/ProduccionSemanal.abi"));
-//Dir. del sc que hemos deployado con Remix
-const contractAddress = '0x9aC37CE0f34b83010dC0C2dC5Ee70fDE60b1ecad';
+const abi = JSON.parse(fs.readFileSync(__dirname +"/ProduccionSemanalHora.abi"));
+//Dir. del sc que hemos deployado el deploy de DappVisor
+const contractAddress = '0x044FBd39E36aEf3631B58DAf40aF6E690Ed912ed';
 
 const MAX_POWER = 400 * 5;  //5 paneles de 400W 
 const DIAS_SOL = 300;
@@ -102,12 +102,14 @@ function generaProduccionDiaria() {
 
 function getPKs_Firmantes() {
     //La primera cuenta es la que se va a utilizar para firmar las transacciones
-    //TIENE QUE TERNER FONDOS.
-    privateKeys.push( '230bcd8db487f554310d367d9d0f1ca7b1c420feb48fe0baaf34b11c212f523b',
+    //TIENE QUE TERNER FONDOS Y TIENE QUE SER LA QUE DEPLOYO EL SC
+    privateKeys.push( 
+    '230bcd8db487f554310d367d9d0f1ca7b1c420feb48fe0baaf34b11c212f523b',
     '8745762b223bf426829b2909f5d954db8f776a12b8836fb74790384a676fc9d8',
     'b352eb0fdcae639ecad63c28dda9e1c1b16617de719455abfa4dd6f5ca7a1b7f'
     
     )
+    for (let i=0;i<
     privateKeys.forEach(pk => addresses.push(web3.eth.accounts.privateKeyToAccount(pk).address));
 }
 
