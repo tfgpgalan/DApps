@@ -11,7 +11,7 @@
 **********************************************************************************/
 const fs = require("fs");
 const path = require("path")
-const datosProvider = require("./datosProvider.json");
+const datosProvider = require("./datosProvider_geth.json");
 const Web3 = require('web3');
 //Se ejecutará la compilación y me devuelve el abi y bytecode
 const { abi, bytecode } = require('./compile');

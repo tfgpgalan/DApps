@@ -1,4 +1,4 @@
-const addressContract = "0x9aC37CE0f34b83010dC0C2dC5Ee70fDE60b1ecad";
+const addressContract = "0xf323f006bAE4717d88988CFa306ff6273D20108b";
 const nodoUrl = 'HTTP://127.0.0.1:9545';
 
 let web3;
@@ -8,7 +8,7 @@ let semanaUnProductor;
 let abi = '';
 
 async function empieza() {
-  await fetch('/ProduccionSemanal.abi').then(async (response) => {
+  await fetch('/ProduccionSemanalHora.abi').then(async (response) => {
     abi = await response.json();
     conctract();
   });
@@ -69,7 +69,7 @@ function muestraGrafica(productorx) {
     console.log(semanaUnProductor);
     Swal.fire({
       toast: true,
-      width: '50%', position: 'top',
+      width: '60%', position: 'top',
       title: `<div style="text-align:center"> Producción semanal de ${productorx}</div>`,
       html: `<div id="container" style="display: block; width: 40em; height: 25em;"></div>`,
       didOpen: () => {

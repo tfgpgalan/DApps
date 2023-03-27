@@ -85,6 +85,8 @@ contract ProduccionSemanalHora is IERC20 {
         }
     }
 //Función para generar valores demo, quitar en producción
+//Graba simulación de producción de un día completo de un productor
+//Solo la puede ejecutar el owner del contrato.
     function acumula_dia(address _address,uint _dayOfWeek,uint[] memory _produccion_hora) public {
         require(owner == msg.sender,unicode"Solo puede utilizar función demo el owner del contrato.");
         require(_dayOfWeek>=1 && _dayOfWeek<=7 && _produccion_hora.length==24,unicode"Día o matriz de horas(24) error");
@@ -94,15 +96,13 @@ contract ProduccionSemanalHora is IERC20 {
         }
         iniciaDia(_dayOfWeek,_address,block.timestamp.subDays(_dayOfWeek-1));
         ProducccionDia storage prodDia=_balanceHoraDayofWeek[_address][_dayOfWeek-1];
-        //prodDia.timestamp=block.timestamp.subDays(_dayOfWeek-1);
         for(uint i = 0; i<24; i++) { 
             prodDia.produccionXhora[i]+=_produccion_hora[i];
             _balance[_address] += _produccion_hora[i];
-
         }
-
     }
 
+//Al iniciar día se rellena todas las horas con producción 0
     function iniciaDia(uint _dia,address _address, uint _timestamp) internal{
         ProducccionDia storage prodDia=_balanceHoraDayofWeek[_address][_dia-1];
         prodDia.timestamp=_timestamp;
@@ -111,8 +111,8 @@ contract ProduccionSemanalHora is IERC20 {
         }
     }
 
-    //Devuelve la matriz de producción semanal de un productor y
-    //los días a que corresponde 
+//Devuelve la matriz de producción semanal de un productor y
+//los días a que corresponde 
     function getBalanceOfDaysOfWeek(address _productor) public view returns(uint256[24][7] memory produccion, uint[7] memory dias) {
         
         for (uint dia=0; dia<=6;dia++){
