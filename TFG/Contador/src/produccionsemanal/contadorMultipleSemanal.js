@@ -22,7 +22,7 @@ getPKs_Firmantes();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(fs.readFileSync(__dirname +"/ProduccionSemanalHora.abi"));
 //Dir. del sc que hemos deployado el deploy de DappVisor
-const contractAddress = '0x044FBd39E36aEf3631B58DAf40aF6E690Ed912ed';
+const contractAddress = '0x616f690B7D54006A9aeb34D36cDFAA309D2f73A7';
 
 const MAX_POWER = 400 * 5;  //5 paneles de 400W 
 const DIAS_SOL = 300;
@@ -39,7 +39,8 @@ async function grabaProduccionSemanal() {
     nombreTk=await scProduccion.methods.name().call();
     console.log(`Unidad de medida: ${nombreTk}`);
     //La primera cuenta se utilizará para firmar todas las transacciones, TIENE QUE TENER FONDOS
-    const privateKeyFirmante = privateKeys[0];
+    const privateKeyFirmante = privateKeys[1];
+    //console.log(privateKeyFirmante)
     for (ipk = 0; ipk < privateKeys.length; ipk++) {
         
         const address = addresses[ipk];
@@ -63,6 +64,8 @@ async function grabaProduccionSemanal() {
             );
 
             const recibo=await web3.eth.sendSignedTransaction(createTx.rawTransaction);
+            console.log(recibo);
+            console.log(await scProduccion.methods.ultimosender().call());
             //Envío la transacción firmada
 /*             web3.eth.sendSignedTransaction(createTx.rawTransaction)
                 .once('receipt', async (recibo) => {
@@ -109,7 +112,11 @@ function getPKs_Firmantes() {
     'b352eb0fdcae639ecad63c28dda9e1c1b16617de719455abfa4dd6f5ca7a1b7f'
     
     )
-    for (let i=0;i<
-    privateKeys.forEach(pk => addresses.push(web3.eth.accounts.privateKeyToAccount(pk).address));
+    for (let i=0;i<privateKeys.length;i++){
+        addresses[i]= web3.eth.accounts.privateKeyToAccount(privateKeys[i]).address
+        console.log(addresses)
+
+    }
+    //privateKeys.forEach(pk => addresses.push(web3.eth.accounts.privateKeyToAccount(pk).address));
 }
 

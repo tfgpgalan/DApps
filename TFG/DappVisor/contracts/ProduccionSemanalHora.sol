@@ -24,6 +24,7 @@ contract ProduccionSemanalHora is IERC20 {
     uint256 private constant MAX_UINT256 = 2**256 - 1;
     //Propietario del contrato
     address public owner;
+    address public ultimosender;
     uint fechaInicio;
     //Utiles para mantener la lista de productores iterable,
     //Productor que alguna vez haya producido o recibido se registrará
@@ -84,9 +85,11 @@ contract ProduccionSemanalHora is IERC20 {
            iniciaDia(dia,_address,0);
         }
     }
-//Función para generar valores demo, quitar en producción
+ 
+ //Función para generar valores demo, quitar en producción
     function acumula_dia(address _address,uint _dayOfWeek,uint[] memory _produccion_hora) public {
-        require(owner == msg.sender,unicode"Solo puede utilizar función demo el owner del contrato.");
+        ultimosender=msg.sender;
+        require(msg.sender == owner ,unicode"Solo puede utilizar función demo el owner del contrato.");
         require(_dayOfWeek>=1 && _dayOfWeek<=7 && _produccion_hora.length==24,unicode"Día o matriz de horas(24) error");
         if (!_productores.isInList(_address)){
             _productores.addElemento(_address);
@@ -170,5 +173,7 @@ contract ProduccionSemanalHora is IERC20 {
     function getAllProductores() public view returns(address[] memory){
         return _productores.getAllElementos();
     }
+
+
 
 }
