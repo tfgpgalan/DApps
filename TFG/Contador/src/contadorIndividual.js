@@ -24,10 +24,10 @@ const nodoUrl = 'HTTP://127.0.0.1:9545';
 const web3 = new Web3(nodoUrl);
 getPK_Firmante_Nodo();
 //Leemos el descriptor del sc Produccion
-const abi = JSON.parse(fs.readFileSync("./src/Produccion.abi"));
-//Dir. del sc que hemos deployado con Remix
-const contractAddress ='0xf128EBE06396A5636230d3425873106C73491470';
-// '0xf128EBE06396A5636230d3425873106C73491470';
+const abi = JSON.parse(fs.readFileSync(__dirname + "/ProduccionSemanalHora.abi"));
+//Dir. del sc  que hemos deployado
+const contractAddress ='0x2F2879E186d65b60080bC2F7f8A3EAc6239DB8e6';
+
 const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
 //Cada cuantos segundos se hace una grabación de la lectura del contador
 const SEG_GRABACION=20;
@@ -36,11 +36,17 @@ const MAX_POWER=400*5;  //5 paneles de 400W
 //En una hora al máx de generación esta instalación produciría 2000Wh o 2kWh
 //Potencia máxima generada en SEG_GRABACION segundos
 const MAX_POWER_PERIODO=(MAX_POWER*SEG_GRABACION)/(60*60);
+const DIAS_SOL = 300;
+const DiasNublados365 = 365 - DIAS_SOL;
+const DiasNublados100 = (DiasNublados365 * 100) / 365;
+const HORAMAXSOL = 13;
 
 var scProduccion;
 var nombreTk;
 var intervalProduccionId = null;
 var conectado = false;
+var dia_ultima_grabacion=0;
+var DiaNublado;
 isConectedDaemon();
 
 function isConectedDaemon() {
@@ -83,7 +89,7 @@ async function grabaProduccion() {
 
     console.log(`Producción acumulada de ${straddress} ANTES de transacción: ${b}${nombreTk}.`);
     
-    const energiaGenerada=Math.floor(Math.random() * MAX_POWER_PERIODO+1);
+    const energiaGenerada=calculaEnergiaGenerada();
     //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación de energía
     let grabaProduccionTx = scProduccion.methods.transfer(ZERO_ADDRESS, energiaGenerada);
     //Creo objeto transacción firmada
@@ -108,6 +114,21 @@ async function grabaProduccion() {
 
 };
 
+function calculaEnergiaGenerada() {
+    let hoy = new Date();
+    //Caso de nuevo día o inicio grabación
+    if (date_diff_indays(dia_ultima_grabacion, hoy) != 0) {
+        dia_ultima_grabacion = hoy;
+        DiaNublado = Math.floor(Math.random() * 100) < DiasNublados100;
+    }
+    const hora = hoy.getHours();
+    //Simula gauss con máxima producción en HORAMAXSOL
+    let energia = Math.E ** (-0.1 * (hora - HORAMAXSOL) ** 2) * MAX_POWER;
+    //Paso de una nube cuando es día nublado
+    const NUBE = DiaNublado ? Math.random() < 0.8 : Math.random() < 0.2;
+    energia = Math.floor(NUBE ? energia * 0.8 : energia);
+    return energia;
+}
 
 function getPK_Firmante_Nodo() {
     const dirNodo = process.argv[2];
@@ -121,3 +142,9 @@ function getPK_Firmante_Nodo() {
     privateKey = pKStore.privateKey;
     address = pKStore.address;
 }
+
+var date_diff_indays = function(date1, date2) {
+    dt1 = new Date(date1);
+    dt2 = new Date(date2);
+    return Math.floor((Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) - Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate()) ) /(1000 * 60 * 60 * 24));
+    }

@@ -2,11 +2,10 @@
   "name": "contador",
   "version": "1.0.0",
   "description": "Grabación en blockchain de lecturas simuladas de un contador eléctrico",
-  "main": "src/contador.js",
+  "main": "src/contadorIndividual.js",
   "scripts": {
     "contador": "node .",
-    "multiple": "node src/contadorMultiple.js",
-    "multiplesemanal": "node src/produccionsemanal/contadorMultipleSemanal.js",
+    "multiplesemanal": "node src/contadorMultipleSemanal.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "PabloG",

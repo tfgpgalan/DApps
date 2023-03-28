@@ -25,7 +25,7 @@ const abi = JSON.parse(
   fs.readFileSync(__dirname + "/ProduccionSemanalHora.abi")
 );
 //Dir. del sc que hemos deployado el deploy de DappVisor
-const contractAddress = "0xf323f006bAE4717d88988CFa306ff6273D20108b";
+const contractAddress = "0x2F2879E186d65b60080bC2F7f8A3EAc6239DB8e6";
 
 const MAX_POWER = 400 * 5; //5 paneles de 400W
 const DIAS_SOL = 300;
@@ -91,18 +91,12 @@ console.log('Catch error');
 
 function generaProduccionDiaria() {
   const DiaNublado = Math.floor(Math.random() * 100) < DiasNublados100;
-  //console.log(DiaNublado)
   pDiaria = [];
   for (hora = 0; hora < 24; hora++) {
     let energiaHora = 0;
     const HORAMAXSOL = 13;
-    //if (hora >= 9 && hora <= 21) energiaHora =(1/(1+(16-hora)**4))*MAX_POWER;
     energiaHora = Math.E ** (-0.1 * (hora - HORAMAXSOL) ** 2) * MAX_POWER;
-    /*         if (hora >= 9 && hora <= 14) energiaHora = (hora - 9) * (MAX_POWER / (14 - 9));
-        if (hora > 14 && hora <= 18) energiaHora = MAX_POWER;
-        if (hora > 18 && hora <= 21) energiaHora = (-(hora - 21) * (MAX_POWER / (21 - 18))); */
     const NUBE = DiaNublado ? Math.random() < 0.8 : Math.random() < 0.2;
-    //console.log(NUBE)
     energiaHora = Math.floor(NUBE ? energiaHora * 0.8 : energiaHora);
     pDiaria.push(energiaHora);
   }

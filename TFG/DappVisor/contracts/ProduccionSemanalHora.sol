@@ -63,7 +63,8 @@ contract ProduccionSemanalHora is IERC20 {
             uint horadeldia=block.timestamp.getHour();
             ProducccionDia storage prodDia=_balanceHoraDayofWeek[msg.sender][dayofWeek-1];
             //Inicio de día con posibilidad de corte de lecturas
-            if (horadeldia<=22 && prodDia.produccionXhora[horadeldia+1]!=0) iniciaDia(dayofWeek,msg.sender,block.timestamp);
+            if (prodDia.timestamp==0 || (horadeldia<=22 && prodDia.produccionXhora[horadeldia+1]!=0))
+               iniciaDia(dayofWeek,msg.sender,block.timestamp);
             emit GrabaHora(msg.sender, dayofWeek-1, horadeldia,_value);
             //Acumula las lecturas que mande el contador en la hora en curso 
             prodDia.produccionXhora[horadeldia]+=_value;
@@ -159,12 +160,12 @@ contract ProduccionSemanalHora is IERC20 {
 
     function borraProductor(address _addressDel) public{
         require(msg.sender==owner,'Solo el owner puede borrar productores.');
-        _productores.removeElemento(_addressDel);
+        _productores.removeElemento(_balance,_addressDel);
     }
 
     function reseteaProductores() public {
         require(owner == msg.sender,"Solo puede resetear el owner del contrato");
-        _productores.removeAllElementos();
+        _productores.removeAllElementos(_balance);
     }
 
     function getAllProductores() public view returns(address[] memory){

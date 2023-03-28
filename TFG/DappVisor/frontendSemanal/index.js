@@ -1,4 +1,20 @@
-const addressContract = "0xf323f006bAE4717d88988CFa306ff6273D20108b";
+/***************************************************************************
+* 
+* Presentación de datos de producción semanales de todas las instalaciones
+* que están conectadas a la bc, donde un nodo está identificado en 
+* nodoUrl y el contrato que guarda la información está referenciado
+* en addressContract.
+* 
+* Se utilizan las siguientes librerías javascript:
+*     .- Bootstrap.
+*     .- SweetAlert2, ventana para mensajes y gráficos.
+*     .- AnyChart para la creación de los gráficos.
+* 
+**************************************************************/
+
+
+
+const addressContract = "0x2F2879E186d65b60080bC2F7f8A3EAc6239DB8e6";
 const nodoUrl = 'HTTP://127.0.0.1:9545';
 
 let web3;
@@ -10,22 +26,25 @@ let abi = '';
 async function empieza() {
   await fetch('/ProduccionSemanalHora.abi').then(async (response) => {
     abi = await response.json();
-    conctract();
+    inicio();
   });
 
 }
 
-function conctract() {
+function inicio() {
   web3 = new Web3(nodoUrl);
+  //Para comprobar la conexión con el nodo utilizo el método getId
   web3.eth.net.getId()
     .then(() => {
+      //Referencia al sc
       scProduccion = new web3.eth.Contract(abi, addressContract);
+      //Obtenemos el nombre de la unidad de medida y el número de decimales para presentación
       scProduccion.methods.name().call().then(nombreTk => document.getElementById('umedida').innerHTML = `${nombreTk}`);
       scProduccion.methods.decimals().call().then(dec => decimales = dec);
       Swal.mixin({
         toast: true, position: 'bottom-up', showConfirmButton: false, timer: 2000,
         timerProgressBar: false, icon: 'success', title: 'Conexión realizada',
-      }).fire();;
+      }).fire();
       listaProductores();
     }
     )
@@ -53,7 +72,8 @@ const listaProductores = () => {
         const balancecondecimales = (balance / 10 ** decimales).toLocaleString(undefined, { minimumFractionDigits: decimales });
         tablaProductores += `<tr><th scope="row">${++i}</th><td>${productor}</td>`;
         tablaProductores += `<td class="text-right">${balancecondecimales}</td>`;
-        tablaProductores += `<td class="text-right"><button type="button" class="btn btn-link" style='padding:0px' onclick="muestraGrafica('${productor}')">`;
+        tablaProductores += `<td class="text-right">`;
+        tablaProductores += `<button type="button" class="btn btn-link" style='padding:0px' onclick="muestraGrafica('${productor}')">`;
         tablaProductores += `<span class="bi bi-bar-chart"></span></button></td></tr>`;
         document.getElementById('lProductores').innerHTML = tablaProductores;
       });
@@ -175,10 +195,12 @@ function getProduccionSemanal(unProductor) {
     let produccionSemanal = respuesta.produccion;
     let diasSemana = [];
     for (i = 0; i < respuesta.dias.length; i++) {
-      const diax = respuesta.dias[i];
-      let sumProdDia = 0;
-      produccionSemanal[i].forEach(valor => sumProdDia += parseInt(valor));
-      diasSemana.push({ fecha: new Date(diax * 1000), produccionDia: sumProdDia/ (10 ** decimales), detalleDiario: produccionSemanal[i] });
+      const diax = parseInt(respuesta.dias[i]);
+      if (diax > 0) {
+        let sumProdDia = 0;
+        produccionSemanal[i].forEach(valor => sumProdDia += parseInt(valor));
+        diasSemana.push({ fecha: new Date(diax * 1000), produccionDia: sumProdDia / (10 ** decimales), detalleDiario: produccionSemanal[i] });
+      }
     }
 
     let salida = { productor: unProductor, produccionSemanal: diasSemana };
