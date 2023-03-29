@@ -26,7 +26,7 @@ getPK_Firmante_Nodo();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(fs.readFileSync(__dirname + "/ProduccionSemanalHora.abi"));
 //Dir. del sc  que hemos deployado
-const contractAddress ='0x2F2879E186d65b60080bC2F7f8A3EAc6239DB8e6';
+const contractAddress ='0x7eF699BbC36D6CD2EEAAE423b3Ae1BEa040695c8';
 
 const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
 //Cada cuantos segundos se hace una grabación de la lectura del contador
@@ -130,6 +130,10 @@ function calculaEnergiaGenerada() {
     return energia;
 }
 
+
+//Toma la private key del almacen de claves en dir keystore y lo desencripta con la password
+//que está en el fichero password.txt. Se obtendrá la clave privada y pública del usuario
+//firmante del nodo donde se está corriendo el script
 function getPK_Firmante_Nodo() {
     const dirNodo = process.argv[2];
     if (dirNodo=='' || !fs.existsSync(dirNodo)) throw Error(`No existe el directorio ${dirNodo}`)

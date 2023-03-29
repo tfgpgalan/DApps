@@ -14,7 +14,7 @@
 
 
 
-const addressContract = "0x2F2879E186d65b60080bC2F7f8A3EAc6239DB8e6";
+const addressContract = "0x678fea36Ce3F68B53c2C29a9C82a6FCf9B91A661";
 const nodoUrl = 'HTTP://127.0.0.1:9545';
 
 let web3;
@@ -195,11 +195,11 @@ function getProduccionSemanal(unProductor) {
     let produccionSemanal = respuesta.produccion;
     let diasSemana = [];
     for (i = 0; i < respuesta.dias.length; i++) {
-      const diax = parseInt(respuesta.dias[i]);
-      if (diax > 0) {
+      const tmpsdiax = parseInt(respuesta.dias[i]);
+      if (tmpsdiax > 0) {
         let sumProdDia = 0;
         produccionSemanal[i].forEach(valor => sumProdDia += parseInt(valor));
-        diasSemana.push({ fecha: new Date(diax * 1000), produccionDia: sumProdDia / (10 ** decimales), detalleDiario: produccionSemanal[i] });
+        diasSemana.push({ fecha: new Date(tmpsdiax*1000), produccionDia: sumProdDia / (10 ** decimales), detalleDiario: produccionSemanal[i] });
       }
     }
 

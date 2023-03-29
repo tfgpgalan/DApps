@@ -44,27 +44,27 @@ library MapIterableLib {
         return FIRST_ADDRESS;
     }
 
-    function removeElemento(MapIterable storage _self,mapping(address => uint256) storage _balance,address _address) internal {
+    function removeElemento(MapIterable storage _self,address _address) internal {
         require(_address!=FIRST_ADDRESS,'Address reservada');
         require(isInList(_self,_address), 'El usuario no existe');
         address prevElemento = getPrevElemento(_self,_address);
-        _balance[_address]=0;
         _self._mapping[prevElemento] = _self._mapping[_address];
         _self._mapping[_address] = address(0);
         _self.contadorElementos--;
     }
 
-    function removeAllElementos(MapIterable storage _self,mapping(address => uint256) storage _balance) internal {
+    function removeAllElementos(MapIterable storage _self) internal {
         address currentAddress =_self._mapping[FIRST_ADDRESS];
         address auxAddress;
         while(currentAddress != FIRST_ADDRESS) {
-            _balance[currentAddress]=0;
+            
             auxAddress=_self._mapping[currentAddress];
             _self._mapping[currentAddress]=address(0);
             currentAddress=auxAddress;
         }
         inicia(_self);
     }
+
 
 
 

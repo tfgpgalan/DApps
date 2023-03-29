@@ -158,16 +158,32 @@ contract ProduccionSemanalHora is IERC20 {
         return true;
     }
 
-    function borraProductor(address _addressDel) public{
+     function borraProductor(address _addressDel) public{
         require(msg.sender==owner,'Solo el owner puede borrar productores.');
-        _productores.removeElemento(_balance,_addressDel);
+        _productores.removeElemento(_addressDel);
+        borra_balances(_addressDel);
     }
 
     function reseteaProductores() public {
         require(owner == msg.sender,"Solo puede resetear el owner del contrato");
-        _productores.removeAllElementos(_balance);
+        address[] memory elementosArray = getAllProductores();
+        for (uint i=0;i<=elementosArray.length;i++){
+            borra_balances(elementosArray[i]);
+        }
+        _productores.removeAllElementos();
+       
     }
 
+    function borra_balances(address sender) internal{
+        delete _balance[sender];
+        for (uint dia=1; dia<=7;dia++){
+            ProducccionDia storage prodDia=_balanceHoraDayofWeek[sender][dia];
+            for(uint hora = 0; hora<24; hora++) { 
+                delete prodDia.produccionXhora[hora];
+            }
+            delete _balanceHoraDayofWeek[sender][dia];
+        } 
+    }
     function getAllProductores() public view returns(address[] memory){
         return _productores.getAllElementos();
     }

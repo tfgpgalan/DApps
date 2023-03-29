@@ -25,7 +25,7 @@ const abi = JSON.parse(
   fs.readFileSync(__dirname + "/ProduccionSemanalHora.abi")
 );
 //Dir. del sc que hemos deployado el deploy de DappVisor
-const contractAddress = "0x2F2879E186d65b60080bC2F7f8A3EAc6239DB8e6";
+const contractAddress = "0x0C74C39BA35783c87e5Ddd931200c7384b201d3F";
 
 const MAX_POWER = 400 * 5; //5 paneles de 400W
 const DIAS_SOL = 300;
