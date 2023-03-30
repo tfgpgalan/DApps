@@ -13,19 +13,20 @@ process.title = "ProductorContador";
 
 const fs = require("fs");
 
+//Dir. del sc que hemos deployado el deploy de DappVisor
+const contractAddress = "0x216177464B0D494569d9e691C075A00D75fe9fc1";
+
 const addressProductor = [];
 const privateKeyFirmante = "230bcd8db487f554310d367d9d0f1ca7b1c420feb48fe0baaf34b11c212f523b";
 const addressFirmante="0x24bB02397880147D1Fa245Dfc422Ad2322CC7A17"; 
 const Web3 = require("web3");
-const nodoUrl = "HTTP://127.0.0.1:9545";
+const nodoUrl = "http://10.10.10.99:8545";
 const web3 = new Web3(nodoUrl);
 getAddress_Productores();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(
   fs.readFileSync(__dirname + "/ProduccionSemanalHora.abi")
 );
-//Dir. del sc que hemos deployado el deploy de DappVisor
-const contractAddress = "0x0C74C39BA35783c87e5Ddd931200c7384b201d3F";
 
 const MAX_POWER = 400 * 5; //5 paneles de 400W
 const DIAS_SOL = 300;

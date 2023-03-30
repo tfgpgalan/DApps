@@ -14,8 +14,8 @@
 
 
 
-const addressContract = "0x678fea36Ce3F68B53c2C29a9C82a6FCf9B91A661";
-const nodoUrl = 'HTTP://127.0.0.1:9545';
+const addressContract = "0x216177464B0D494569d9e691C075A00D75fe9fc1";
+const nodoUrl = "http://10.10.10.10:8545";
 
 let web3;
 let scProduccion;

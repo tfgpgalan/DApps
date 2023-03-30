@@ -16,17 +16,18 @@
 process.title = "ProductorContador";
 
 const fs = require("fs");
+//Dir. del sc  que hemos deployado
+const contractAddress ='0x216177464B0D494569d9e691C075A00D75fe9fc1';
 var address = '';
 var privateKey = '';
 
 const Web3 = require('web3');
-const nodoUrl = 'HTTP://127.0.0.1:9545';
+const nodoUrl = "http://10.10.10.99:8545";
 const web3 = new Web3(nodoUrl);
 getPK_Firmante_Nodo();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(fs.readFileSync(__dirname + "/ProduccionSemanalHora.abi"));
-//Dir. del sc  que hemos deployado
-const contractAddress ='0x7eF699BbC36D6CD2EEAAE423b3Ae1BEa040695c8';
+
 
 const ZERO_ADDRESS = `0x${'0'.repeat(40)}`;
 //Cada cuantos segundos se hace una grabación de la lectura del contador
