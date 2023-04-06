@@ -14,7 +14,7 @@ process.title = "ProductorContador";
 const fs = require("fs");
 
 //Dir. del sc que hemos deployado el deploy de DappVisor
-const contractAddress = "0x216177464B0D494569d9e691C075A00D75fe9fc1";
+const contractAddress = "0x56855ec7dEDA30d4aEF26c3100Ff16D0E9D1F127";
 
 const addressProductor = [];
 const privateKeyFirmante = "230bcd8db487f554310d367d9d0f1ca7b1c420feb48fe0baaf34b11c212f523b";
@@ -45,9 +45,9 @@ async function grabaProduccionSemanal() {
   //La primera cuenta se utilizará para firmar todas las transacciones, TIENE QUE TENER FONDOS
 
   let gas=-1;
-  for (ipk = 0; ipk < addressProductor.length; ipk++) {
-    const address = addressProductor[ipk];
-    console.log(`Address[${ipk}]: ${address}`)
+  for (iProd = 0; iProd < addressProductor.length; iProd++) {
+    const address = addressProductor[iProd];
+    console.log(`Address[${iProd}]: ${address}`)
     const straddress = "".concat(address.slice(0, 5), "...", address.slice(-3));
     for (dow = 1; dow <= 7; dow++) {
         console.log(`Grabando día ${dow} address ${straddress}`);        
@@ -56,14 +56,12 @@ async function grabaProduccionSemanal() {
         
         //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación de energía
         try {
-console.log('Antes de Acumula');            
+          
          grabaProduccionTx = await scProduccion.methods.acumula_dia(address,dow,energiaGenerada);
-console.log('Antes de estimateGas'); 
+         //Solo se estima gas una vez
         if (gas==-1) { gas = await grabaProduccionTx.estimateGas({ from: addressFirmante });}
-console.log('Antes de nonce');         
         //Vamos a tomar la siguiente transacción de la address
         let nonce = await web3.eth.getTransactionCount(addressFirmante);
-console.log('Antes de firmar');         
         //Creo objeto transacción firmada
         const createTx = await web3.eth.accounts.signTransaction(
         {
@@ -77,7 +75,7 @@ console.log('Antes de firmar');
         },
         privateKeyFirmante
       );
-console.log('Antes de enviar');        
+      
       //Envío la transacción firmada
       const recibo = await web3.eth.sendSignedTransaction(createTx.rawTransaction);
     }

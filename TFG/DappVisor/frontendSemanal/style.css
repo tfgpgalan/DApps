@@ -1,16 +1,70 @@
 body {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 #enableEthereumButton,
-#accountSelected{
-    position: fixed;
-    top: 25px;
-    right: 25px;
+#accountSelected {
+  position: fixed;
+  top: 25px;
+  right: 25px;
 }
-body>div{
-    width: 60%;
-    margin: 5% auto 0;
+
+.cabecera {
+    width: 95%;
+    padding: 1% 0 0 0;
+  }
+#logoUni{
+    height:60px;
+    margin-right: 5%;
 }
+#tfg{ font-family: Garamond; font-size: 35px; font-style: normal; 
+    font-variant: normal; font-weight: 700; line-height: 28px; }
+.contenido {
+  width: 60%;
+  margin: 2% auto 0;
+}
+
+.tecnologico {
+    font-size: 1.5em;
+    font-family: 'Orbitron', sans-serif;
+    color: #212721;
+    text-shadow: 1px 1px #000000;
+  }
+  
+
+.fade-in-image {
+    animation: fadeIn 5s;
+    -webkit-animation: fadeIn 5s;
+    -moz-animation: fadeIn 5s;
+    -o-animation: fadeIn 5s;
+    -ms-animation: fadeIn 5s;
+  }
+  
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  @-moz-keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  @-webkit-keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  @-o-keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  @-ms-keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+

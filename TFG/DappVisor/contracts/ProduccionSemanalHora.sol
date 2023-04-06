@@ -9,24 +9,26 @@ import "./BokkyPooBahsDateTimeLibrary.sol";
 contract ProduccionSemanalHora is IERC20 {
     //Básicas del ERC20
     uint256 public totalSupply;
+    //Historico produccion de cada productor
     mapping(address => uint256) private _balance;
     mapping(address => mapping(address => uint256)) private _allowance;
+    uint8 public decimals; //Decimales para presentación
+    string public name; //Unidad de de medida
+    uint256 private constant MAX_UINT256 = 2**256 - 1;
     //Balance de cada address por día de la semana y dentro de este por cada hora del día
     struct ProducccionDia {
-       uint timestamp;
-       mapping (uint => uint256) produccionXhora;
+       uint timestamp; //Día de produccion
+       mapping (uint => uint256) produccionXhora; // 24 horas
     }
     //Cada address tendrá un mapping de 7 dias y cada uno de 24 horas 
-    //y cada hora acumulará la producción que mande el contador en esa hora.
+    //y cada hora acumulará la producción que mande el contador durante esa hora.
     mapping(address => mapping(uint => ProducccionDia )) private _balanceHoraDayofWeek;
-    uint8 public decimals;
-    string public name;
-    uint256 private constant MAX_UINT256 = 2**256 - 1;
+
     //Propietario del contrato
     address public owner;
-    uint fechaInicio;
+    uint fechaCreacion;
     //Utiles para mantener la lista de productores iterable,
-    //Productor que alguna vez haya producido o recibido se registrará
+    //Productor que alguna vez haya producido se registrará
     //en _productores.
     using MapIterableLib for MapIterableLib.MapIterable;
     MapIterableLib.MapIterable private _productores;
@@ -45,7 +47,7 @@ contract ProduccionSemanalHora is IERC20 {
         decimals = _decimalUnits;
         _productores.inicia();
         owner = msg.sender;
-        fechaInicio=block.timestamp;
+        fechaCreacion=block.timestamp;
         
     }
 
@@ -81,6 +83,7 @@ contract ProduccionSemanalHora is IERC20 {
     }
 
     function inicia_balance_productor_nuevo(address _address) internal{
+        //Produccion semanal a 0
         for (uint dia=1; dia<=7;dia++){
            iniciaDia(dia,_address,0);
         }
@@ -107,8 +110,8 @@ contract ProduccionSemanalHora is IERC20 {
     function iniciaDia(uint _dia,address _address, uint _timestamp) internal{
         ProducccionDia storage prodDia=_balanceHoraDayofWeek[_address][_dia-1];
         prodDia.timestamp=_timestamp;
-        for(uint i = 0; i<24; i++) { 
-            prodDia.produccionXhora[i]=0;
+        for(uint horax = 0; horax<24; horax++) { 
+            prodDia.produccionXhora[horax]=0;
         }
     }
 
@@ -127,7 +130,7 @@ contract ProduccionSemanalHora is IERC20 {
 
 
     
-    
+    //Original del ERC20, se utilizaría para el mercado
     function transferFrom(address _from, address _to,uint256 _value) public override returns (bool success) {
         uint256 _allowanced = _allowance[_from][msg.sender];
         require(_balance[_from] >= _value && _allowanced >= _value);
@@ -158,13 +161,15 @@ contract ProduccionSemanalHora is IERC20 {
         return true;
     }
 
-     function borraProductor(address _addressDel) public{
+
+
+     function borrarProductor(address _addressDel) public{
         require(msg.sender==owner,'Solo el owner puede borrar productores.');
         _productores.removeElemento(_addressDel);
         borra_balances(_addressDel);
     }
 
-    function reseteaProductores()  public {
+    function borrarProductores()  public {
         require(owner == msg.sender,'Solo puede resetear el owner del contrato');
         address[] memory elementosArray = getAllProductores();
         for (uint i=0;i<elementosArray.length;i++){

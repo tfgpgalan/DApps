@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
@@ -57,7 +56,6 @@ library MapIterableLib {
         address currentAddress =_self._mapping[FIRST_ADDRESS];
         address auxAddress;
         while(currentAddress != FIRST_ADDRESS) {
-            
             auxAddress=_self._mapping[currentAddress];
             _self._mapping[currentAddress]=address(0);
             currentAddress=auxAddress;

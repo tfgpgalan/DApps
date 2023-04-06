@@ -2,27 +2,31 @@
 /**
  * TFG Pablo Galan
  * Script simulador grabación de producción de energía en la bc.
- * Se ejecuta con npm start <Directorio del nodo>
+ * Se ejecuta con npm run contador <Directorio del nodo>
  * Tienen que exitir los ficheros:
  *   <Directorio del nodo>/keystore/<Unico fichero>: donde están las credenciales
  *          de la dirección que firma las transacciones en este nodo.
  *   <Directorio del nodo>/password.txt: password para desencriptar las credenciales
  * 
  * Este script se pondría en cada nodo de la red para simular contador de producción de electricidad.
+ * En nuestro caso la ejecución más probable será:
+ *  npm run contador /home/pi/geth/nodePi
 **/
 
 
 
 process.title = "ProductorContador";
-
+const os = require('os');
 const fs = require("fs");
-//Dir. del sc  que hemos deployado
-const contractAddress ='0x216177464B0D494569d9e691C075A00D75fe9fc1';
+//Dir. del sc  que hemos deployado viene como tercer argumento de llamada
+const contractAddress = getSc_Address();//'0x216177464B0D494569d9e691C075A00D75fe9fc1';
 var address = '';
 var privateKey = '';
 
+const eth0Ip= dirIp();
+
 const Web3 = require('web3');
-const nodoUrl = "http://10.10.10.99:8545";
+const nodoUrl = `http://${eth0Ip}:8545`;
 const web3 = new Web3(nodoUrl);
 getPK_Firmante_Nodo();
 //Leemos el descriptor del sc Produccion
@@ -44,6 +48,7 @@ const HORAMAXSOL = 13;
 
 var scProduccion;
 var nombreTk;
+var decimales;
 var intervalProduccionId = null;
 var conectado = false;
 var dia_ultima_grabacion=0;
@@ -79,6 +84,8 @@ function iniciaGrabacion() {
     scProduccion = new web3.eth.Contract(abi, contractAddress);
     //Llamamos al metodo name del sc ERC20, que al deployarlo le dimos la unidad de medida 
     scProduccion.methods.name().call().then(nombretk => {nombreTk=nombretk;console.log(`Unidad de medida: ${nombreTk}`)});
+    //Método decimals para presentar las cantidades en la unidad de medida
+    scProduccion.methods.decimals().call().then(dec => decimales = dec);
     //Cada SEG_GRABACION segundos crea una grabación
     intervalProduccionId = setInterval(grabaProduccion, SEG_GRABACION*1000);
 }
@@ -86,9 +93,9 @@ function iniciaGrabacion() {
 async function grabaProduccion() {
     const straddress=''.concat(address.slice(0,5),'...',address.slice(-3));
     //Comprobamos balance de la cuenta antes de transferir
-    const b=await scProduccion.methods.balanceOf(address).call();
-
-    console.log(`Producción acumulada de ${straddress} ANTES de transacción: ${b}${nombreTk}.`);
+    let balance=await scProduccion.methods.balanceOf(address).call();
+    balance =(balance / 10 ** decimales).toLocaleString(undefined, { minimumFractionDigits: decimales });
+    console.log(`Producción acumulada de ${straddress} ANTES de transacción: ${balance}${nombreTk}.`);
     
     const energiaGenerada=calculaEnergiaGenerada();
     //Referencia al método llamado, la dir. 0x0 identifica en el sc que es una grabación de energía
@@ -108,8 +115,9 @@ async function grabaProduccion() {
     //Envío la transacción firmada
     web3.eth.sendSignedTransaction(createTx.rawTransaction)
         .once('receipt', async (recibo) => {
-            const b=await scProduccion.methods.balanceOf(address).call();
-            console.log(`Producción acumulada de ${straddress} DESPUÉS de transacción: ${b}${nombreTk} (Blq. ${recibo.blockNumber}).`);
+            let balance=await scProduccion.methods.balanceOf(address).call();
+            balance =(balance / 10 ** decimales).toLocaleString(undefined, { minimumFractionDigits: decimales });
+            console.log(`Producción acumulada de ${straddress} DESPUÉS de transacción: ${balance} ${nombreTk} (Blq. ${recibo.blockNumber}).`);
         })
         .on('error', (errx) => console.log(`Error al grabar dato ${errx}`))
 
@@ -146,6 +154,31 @@ function getPK_Firmante_Nodo() {
     let pKStore = web3.eth.accounts.decrypt(encrypted_key, passw);
     privateKey = pKStore.privateKey;
     address = pKStore.address;
+}
+
+
+
+//Obtiene la ip ethernet del equipo
+function dirIp(){
+  let interfaces = os.networkInterfaces();
+  
+  let eth =interfaces['eth0'] || interfaces['Ethernet'] || interfaces['Ethernet 2'] || interfaces['Local Area Connection'];
+  let ipObj = eth.find(i => i.family === 'IPv4');
+  let ip= ipObj ? ipObj.address : null;
+  if (ip==null){
+    console.log("No encontrada dirección Ip Ethernet");
+    process.exit(1);
+  }
+  return ip;
+}
+
+function getSc_Address(){
+    const a=process.argv[3];
+    if (a==null){
+        console.log("No especificada la dirección del smartcontract ProduccionSemanal");
+        process.exit(1);
+    }
+    return a;
 }
 
 var date_diff_indays = function(date1, date2) {

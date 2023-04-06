@@ -32,6 +32,7 @@ async function empieza() {
 }
 
 function inicio() {
+  $('#nodoUrl').text(nodoUrl);
   web3 = new Web3(nodoUrl);
   //Para comprobar la conexión con el nodo utilizo el método getId
   web3.eth.net.getId()
@@ -116,10 +117,8 @@ function muestraGraficaSemanal(ctx) {
   data = anychart.data.set(data);
   // map the data
   var dataMapping = data.mapAs({ x: 0, value: 1 });
-
   // create a column chart
   var chart = anychart.column();
-
   // set the data
   var column = chart.column(dataMapping);
 
@@ -129,14 +128,13 @@ function muestraGraficaSemanal(ctx) {
   chart.xAxis().title('Día');
   chart.yAxis().title('kWh');
   chart.yGrid().enabled(true);
-  // configure tooltips
+  // Tooltip para mostrar gráfica horaría del día
   let tooltip = chart.tooltip();
   tooltip.useHtml(true);
   tooltip.separator(false);
   tooltip.title(false);
 
   var tooltipChart = null;
-
   chart.listen("pointMouseOver", function (e) {
     var index = e.pointIndex;
     if (tooltipChart == null) tooltipChart = createChart();
@@ -150,7 +148,7 @@ function muestraGraficaSemanal(ctx) {
     tooltipChart.data(dataDia);
     let totalDia = (prodDia.produccionDia).toLocaleString(undefined, { minimumFractionDigits: decimales });
     tooltipChart.title(`Producción día: ${getFormattedDate(prodDia.fecha)} - ${totalDia} kWh, distribución por horas<br>`);
-    tooltipChart.xAxis().title('Hora del día');
+    tooltipChart.xAxis().title('Hora del día (UTC)');
     tooltipChart.yAxis().title('Wh');
     tooltipChart.yGrid().enabled(true);
   });
@@ -217,5 +215,5 @@ function getFormattedDate(date) {
   return day + '/' + month;// + '/' + year;
 }
 
-window.onload = empieza();
+// window.onload = empieza();
 
