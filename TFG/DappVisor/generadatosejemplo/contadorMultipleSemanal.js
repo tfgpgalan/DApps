@@ -1,11 +1,11 @@
 /**
  * TFG Pablo Galan
  * Script simulador grabación de producción de energía en la bc.
- * Se ejecuta con npm run multiple.
+ * Se ejecuta con npm run multiplesemanal.
  * Vamos a tomar varias address de varias cuentas para simular generación
  * en varios contadores.
- * La firma se hará con la clave privada de la primera address de la matriz privateKeys
- * que tiene que ser del owner del contrato ProduccionSemanalHora
+ * La firma se hará con la clave privada de la address 
+ * owner del del contrato ProduccionSemanalHora
  * 
  **/
 
@@ -14,7 +14,7 @@ process.title = "ProductorContador";
 const fs = require("fs");
 
 //Dir. del sc que hemos deployado el deploy de DappVisor
-const contractAddress = "0x56855ec7dEDA30d4aEF26c3100Ff16D0E9D1F127";
+const contractAddress = "0xa26C28964db50486CA811cc45321985E165B6294";
 
 const addressProductor = [];
 const privateKeyFirmante = "230bcd8db487f554310d367d9d0f1ca7b1c420feb48fe0baaf34b11c212f523b";
@@ -25,7 +25,7 @@ const web3 = new Web3(nodoUrl);
 getAddress_Productores();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(
-  fs.readFileSync(__dirname + "/ProduccionSemanalHora.abi")
+  fs.readFileSync(__dirname + "/../frontendSemanal/ProduccionSemanalHora.abi")
 );
 
 const MAX_POWER = 400 * 5; //5 paneles de 400W
@@ -105,6 +105,6 @@ function generaProduccionDiaria() {
 
 function getAddress_Productores() {
     addressProductor[0]="0x24bB02397880147D1Fa245Dfc422Ad2322CC7A17";
-    addressProductor[1]="0x8628b9F3f125d889cA6a08C61E70Cc34B4B604a0";
+    addressProductor[1]="0x1820D24352aDBDEf327d23Af9E6642B649618e96";
     addressProductor[2]="0xD3007eddA70Acf65CA744BA8Eb17016B4f4759A9";
 }

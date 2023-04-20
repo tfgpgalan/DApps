@@ -4,9 +4,7 @@
   "description": "Grabación en blockchain de lecturas simuladas de un contador eléctrico",
   "main": "src/contadorIndividual.js",
   "scripts": {
-    "contador": "node .",
-    "multiplesemanal": "node src/contadorMultipleSemanal.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "contador": "node ."
   },
   "author": "PabloG",
   "license": "ISC",

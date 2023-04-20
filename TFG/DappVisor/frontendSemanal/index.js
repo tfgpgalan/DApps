@@ -14,7 +14,7 @@
 
 
 
-const addressContract = "0x216177464B0D494569d9e691C075A00D75fe9fc1";
+const addressContract = "0xa26C28964db50486CA811cc45321985E165B6294";
 const nodoUrl = "http://10.10.10.10:8545";
 
 let web3;
@@ -32,7 +32,8 @@ async function empieza() {
 }
 
 function inicio() {
-  $('#nodoUrl').text(nodoUrl);
+  $('#nodoUrl').text(`Nodo:  ${nodoUrl}`);
+  $('#sc').text(`SmartContract ProduccionSemanalHora address: ${addressContract}`);
   web3 = new Web3(nodoUrl);
   //Para comprobar la conexión con el nodo utilizo el método getId
   web3.eth.net.getId()

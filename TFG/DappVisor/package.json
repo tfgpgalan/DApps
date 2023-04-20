@@ -1,15 +1,17 @@
 {
-  "name": "dappvideo",
+  "name": "dappvisor",
   "version": "1.0.0",
-  "description": "",
+  "description": "Despliege y presentación del sc ProduccionSemanalHora",
   "main": "index.js",
   "scripts": {
     "compile": "node ./contracts/js/compile.js ProduccionSemanalHora",
     "deploy": "node ./contracts/js/deploy.js ProduccionSemanalHora \"[0, \"\"kWh\"\", 3]\"",
-    "dev": "lite-server"
+    "dev": "lite-server",
+    "multiplesemanal": "node ./generadatosejemplo/contadorMultipleSemanal.js",
+    "resetproduccion": "node ./generadatosejemplo/resetproduccion.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Pablo Galán Acedo",
   "license": "ISC",
   "dependencies": {
     "solc": "^0.8.19",

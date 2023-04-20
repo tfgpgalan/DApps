@@ -132,7 +132,7 @@ function calculaEnergiaGenerada() {
     }
     const hora = hoy.getHours();
     //Simula gauss con máxima producción en HORAMAXSOL
-    let energia = Math.E ** (-0.1 * (hora - HORAMAXSOL) ** 2) * MAX_POWER;
+    let energia = Math.E ** (-0.1 * (hora - HORAMAXSOL) ** 2) * MAX_POWER_PERIODO;
     //Paso de una nube cuando es día nublado
     const NUBE = DiaNublado ? Math.random() < 0.8 : Math.random() < 0.2;
     energia = Math.floor(NUBE ? energia * 0.8 : energia);

@@ -3,7 +3,9 @@ body {
   justify-content: center;
   align-items: flex-start;
   flex-wrap: wrap;
+  
 }
+
 #enableEthereumButton,
 #accountSelected {
   position: fixed;
@@ -19,7 +21,7 @@ body {
     height:60px;
     margin-right: 5%;
 }
-#tfg{ font-family: Garamond; font-size: 35px; font-style: normal; 
+#tfgtitle{ font-size: 35px; font-style: normal; 
     font-variant: normal; font-weight: 700; line-height: 28px; }
 .contenido {
   width: 60%;
