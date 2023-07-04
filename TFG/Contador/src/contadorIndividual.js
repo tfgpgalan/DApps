@@ -20,15 +20,14 @@ const os = require('os');
 const fs = require("fs");
 //Dir. del sc  que hemos deployado viene como tercer argumento de llamada
 const contractAddress = getSc_Address();//'0x216177464B0D494569d9e691C075A00D75fe9fc1';
-var address = '';
-var privateKey = '';
+var firmante={address:'',privateKey:''};
 
 const eth0Ip= dirIp();
 
 const Web3 = require('web3');
 const nodoUrl = `http://${eth0Ip}:8545`;
 const web3 = new Web3(nodoUrl);
-getPK_Firmante_Nodo();
+firmante=get_Firmante_Nodo();
 //Leemos el descriptor del sc Produccion
 const abi = JSON.parse(fs.readFileSync(__dirname + "/ProduccionSemanalHora.abi"));
 
@@ -91,9 +90,9 @@ function iniciaGrabacion() {
 }
 
 async function grabaProduccion() {
-    const straddress=''.concat(address.slice(0,5),'...',address.slice(-3));
+    const straddress=''.concat(firmante.address.slice(0,5),'...',firmante.address.slice(-3));
     //Comprobamos balance de la cuenta antes de transferir
-    let balance=await scProduccion.methods.balanceOf(address).call();
+    let balance=await scProduccion.methods.balanceOf(firmante.address).call();
     balance =(balance / 10 ** decimales).toLocaleString(undefined, { minimumFractionDigits: decimales });
     console.log(`Producción acumulada de ${straddress} ANTES de transacción: ${balance}${nombreTk}.`);
     
@@ -109,13 +108,13 @@ async function grabaProduccion() {
             gas: await grabaProduccionTx.estimateGas({ value: '0' }),
             value: '0'
         },
-        privateKey
+        firmante.privateKey
     );
 
     //Envío la transacción firmada
     web3.eth.sendSignedTransaction(createTx.rawTransaction)
         .once('receipt', async (recibo) => {
-            let balance=await scProduccion.methods.balanceOf(address).call();
+            let balance=await scProduccion.methods.balanceOf(firmante.address).call();
             balance =(balance / 10 ** decimales).toLocaleString(undefined, { minimumFractionDigits: decimales });
             console.log(`Producción acumulada de ${straddress} DESPUÉS de transacción: ${balance} ${nombreTk} (Blq. ${recibo.blockNumber}).`);
         })
@@ -143,7 +142,7 @@ function calculaEnergiaGenerada() {
 //Toma la private key del almacen de claves en dir keystore y lo desencripta con la password
 //que está en el fichero password.txt. Se obtendrá la clave privada y pública del usuario
 //firmante del nodo donde se está corriendo el script
-function getPK_Firmante_Nodo() {
+function get_Firmante_Nodo() {
     const dirNodo = process.argv[2];
     if (dirNodo=='' || !fs.existsSync(dirNodo)) throw Error(`No existe el directorio ${dirNodo}`)
     let dirKeyStore = `${dirNodo}/keystore`;
@@ -152,8 +151,10 @@ function getPK_Firmante_Nodo() {
     let encrypted_key = JSON.parse(fs.readFileSync(dirKeyStore + '/' + file));
     let passw = fs.readFileSync(`${dirNodo}/password.txt`, { encoding: 'utf8', flag: 'r' });
     let pKStore = web3.eth.accounts.decrypt(encrypted_key, passw);
-    privateKey = pKStore.privateKey;
-    address = pKStore.address;
+    let lprivateKey = pKStore.privateKey;
+    let laddress = pKStore.address;
+    
+    return {address:laddress,privateKey:lprivateKey};
 }
 
 
